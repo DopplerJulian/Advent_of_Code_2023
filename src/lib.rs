@@ -275,11 +275,11 @@ mod tests {
     #[test]
     fn day11p1() {
         let pzzl = test_utils::read_file_as_string("./test_data/day_11_e.txt").unwrap();
-        let result = days::day_11::calculate(pzzl.as_str(),2);
+        let result = days::day_11::calculate(pzzl.as_str(), 2);
         assert_eq!(result, 374);
 
         let pzzl = test_utils::read_file_as_string("./test_data/day_11_p.txt").unwrap();
-        let result = days::day_11::calculate(pzzl.as_str(),2);
+        let result = days::day_11::calculate(pzzl.as_str(), 2);
         // println!("{result}");
         assert_eq!(result, 9805264);
     }
@@ -287,13 +287,13 @@ mod tests {
     #[test]
     fn day11p2() {
         let pzzl = test_utils::read_file_as_string("./test_data/day_11_e.txt").unwrap();
-        let result = days::day_11::calculate(pzzl.as_str(),10);
+        let result = days::day_11::calculate(pzzl.as_str(), 10);
         assert_eq!(result, 1030);
-        let result = days::day_11::calculate(pzzl.as_str(),100);
+        let result = days::day_11::calculate(pzzl.as_str(), 100);
         assert_eq!(result, 8410);
 
         let pzzl = test_utils::read_file_as_string("./test_data/day_11_p.txt").unwrap();
-        let result = days::day_11::calculate(pzzl.as_str(),1_000_000);
+        let result = days::day_11::calculate(pzzl.as_str(), 1_000_000);
         // println!("{result}");
         assert_eq!(result, 779032247216);
     }
@@ -314,14 +314,38 @@ mod tests {
     // fn day12p2() {
     //     let pzzl = test_utils::read_file_as_string("./test_data/day_12_e.txt").unwrap();
     //     days::day_12::part_2(pzzl.as_str());
-        // assert_eq!(result, 525152);
+    // assert_eq!(result, 525152);
 
 
-        // let pzzl = test_utils::read_file_as_string("./test_data/day_12_p.txt").unwrap();
-        // days::day_12::part_2(pzzl.as_str());
-        //println!("{result}");
-        // assert_eq!(result, 8075);
+    // let pzzl = test_utils::read_file_as_string("./test_data/day_12_p.txt").unwrap();
+    // days::day_12::part_2(pzzl.as_str());
+    //println!("{result}");
+    // assert_eq!(result, 8075);
     // }
+
+    #[test]
+    fn day13p1() {
+        let pzzl = test_utils::read_file_as_string("./test_data/day_13_e.txt").unwrap();
+        let result = days::day_13::part_1(pzzl.as_str());
+        assert_eq!(result, 405);
+
+        let pzzl = test_utils::read_file_as_string("./test_data/day_13_p.txt").unwrap();
+        let result = days::day_13::part_1(pzzl.as_str());
+        // println!("{result}");
+        assert_eq!(result, 30518);
+    }
+
+    #[test]
+    fn day13p2() {
+        let pzzl = test_utils::read_file_as_string("./test_data/day_13_e.txt").unwrap();
+        let result = days::day_13::part_2(pzzl.as_str());
+        assert_eq!(result, 400);
+
+        let pzzl = test_utils::read_file_as_string("./test_data/day_13_p.txt").unwrap();
+        let result = days::day_13::part_2(pzzl.as_str());
+        // println!("{result}");
+        assert_eq!(result, 36735);
+    }
 }
 
 #[cfg(test)]
@@ -457,7 +481,7 @@ mod big_bois {
         let time = start.elapsed();
 
         let start2 = Instant::now();
-        let result = days::day_11::calculate(pzzl.as_str(),2);
+        let result = days::day_11::calculate(pzzl.as_str(), 2);
         let time2 = start2.elapsed();
 
         println!("{}", result);
@@ -472,7 +496,7 @@ mod big_bois {
         let time = start.elapsed();
 
         let start2 = Instant::now();
-        let result = days::day_11::calculate(pzzl.as_str(),2);
+        let result = days::day_11::calculate(pzzl.as_str(), 2);
         let time2 = start2.elapsed();
 
         println!("{}", result);
@@ -487,7 +511,7 @@ mod big_bois {
         let time = start.elapsed();
 
         let start2 = Instant::now();
-        let result = days::day_11::calculate(pzzl.as_str(),1_000_000);
+        let result = days::day_11::calculate(pzzl.as_str(), 1_000_000);
         let time2 = start2.elapsed();
 
         println!("{}", result);
