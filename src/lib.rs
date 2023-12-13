@@ -297,6 +297,31 @@ mod tests {
         // println!("{result}");
         assert_eq!(result, 779032247216);
     }
+
+    #[test]
+    fn day12p1() {
+        let pzzl = test_utils::read_file_as_string("./test_data/day_12_e.txt").unwrap();
+        let result = days::day_12::part_1(pzzl.as_str());
+        assert_eq!(result, 21);
+
+        let pzzl = test_utils::read_file_as_string("./test_data/day_12_p.txt").unwrap();
+        let result = days::day_12::part_1(pzzl.as_str());
+        // println!("{result}");
+        assert_eq!(result, 8075);
+    }
+
+    // #[test]
+    // fn day12p2() {
+    //     let pzzl = test_utils::read_file_as_string("./test_data/day_12_e.txt").unwrap();
+    //     days::day_12::part_2(pzzl.as_str());
+        // assert_eq!(result, 525152);
+
+
+        // let pzzl = test_utils::read_file_as_string("./test_data/day_12_p.txt").unwrap();
+        // days::day_12::part_2(pzzl.as_str());
+        //println!("{result}");
+        // assert_eq!(result, 8075);
+    // }
 }
 
 #[cfg(test)]
