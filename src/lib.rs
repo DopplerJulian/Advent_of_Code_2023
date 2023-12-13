@@ -518,4 +518,34 @@ mod big_bois {
         println!("Time taken for calculation: {:.2?}", time2);
         println!("Time taken for read: {:.2?}", time);
     }
+
+    #[test]
+    fn bigger13p1() {
+        let start = Instant::now();
+        let pzzl = test_utils::read_file_as_string(r"./big_bois/bb_d13.txt").unwrap();
+        let time = start.elapsed();
+
+        let start2 = Instant::now();
+        let result = days::day_13::part_1(pzzl.as_str());
+        let time2 = start2.elapsed();
+
+        println!("{}", result);
+        println!("Time taken for calculation: {:.2?}", time2);
+        println!("Time taken for read: {:.2?}", time);
+    }
+
+    #[test]
+    fn bigger13p2() {
+        let start = Instant::now();
+        let pzzl = test_utils::read_file_as_string(r"./big_bois/bb_d13.txt").unwrap();
+        let time = start.elapsed();
+
+        let start2 = Instant::now();
+        let result = days::day_13::part_2(pzzl.as_str());
+        let time2 = start2.elapsed();
+
+        println!("{}", result);
+        println!("Time taken for calculation: {:.2?}", time2);
+        println!("Time taken for read: {:.2?}", time);
+    }
 }

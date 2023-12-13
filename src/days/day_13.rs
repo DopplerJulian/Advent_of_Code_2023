@@ -1,4 +1,5 @@
 use ndarray::{Array, Array2};
+use rayon::prelude::*;
 #[allow(unused)]
 pub fn part_1(pat: &str) -> usize {
     let mut patterns: Vec<_> = pat.lines().collect();
@@ -23,23 +24,23 @@ pub fn part_1(pat: &str) -> usize {
 
     let mut result: usize = 0;
     for pattern in pats.iter(){
-        let rows: Vec<_> = pattern.rows().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
-        let mut is_row = false;
+        let cols: Vec<_> = pattern.rows().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
+        let mut is_col = false;
 
-        for i in 1..rows.len() {
-            if rows[..i].iter().rev().zip(&rows[i..])
+        for i in 1..cols.len() {
+            if cols[..i].iter().rev().zip(&cols[i..])
                 .all(|(from, to)| to.eq(from)) {
                 result += i;
-                is_row = true;
+                is_col = true;
                 break
             }
         }
-        if is_row {continue}
+        if is_col {continue}
 
-        let col: Vec<_> = pattern.columns().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
+        let rows: Vec<_> = pattern.columns().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
 
-        for i in 1..col.len() {
-            if col[..i].iter().rev().zip(&col[i..])
+        for i in 1..rows.len() {
+            if rows[..i].iter().rev().zip(&rows[i..])
                 .all(|(from, to)| to.eq(from)) {
                 result += i*100;
                 break
@@ -52,7 +53,7 @@ pub fn part_1(pat: &str) -> usize {
 
 #[allow(unused)]
 pub fn part_2(pat: &str) -> usize {
-    let mut patterns: Vec<_> = pat.lines().collect();
+    let mut patterns: Vec<_> = pat.par_lines().collect();
 
     let patterns: Vec<Vec<Vec<bool>>> = patterns.split(|&l| l.is_empty())
         .map(|chunk| chunk.iter().map(|&l| l.chars().map(|c| c=='#').collect()).collect())
@@ -74,28 +75,28 @@ pub fn part_2(pat: &str) -> usize {
 
     let mut result: usize = 0;
     for pattern in pats.iter(){
-        let rows: Vec<_> = pattern.rows().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
-        let mut is_row = false;
+        let cols: Vec<_> = pattern.rows().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
+        let mut is_col = false;
 
-        'outer:for i in 1..rows.len() {
-            for cmp_index in 0..i.min(*&rows[i..].len()){
-                if rows[..i].iter().rev().zip(&rows[i..])
+        'outer:for i in 1..cols.len() {
+            for cmp_index in 0..i.min(*&cols[i..].len()){
+                if cols[..i].iter().rev().zip(&cols[i..])
                     .enumerate()
                     .all(|(cmp_i, (from, to))| if cmp_i==cmp_index {eq_any_with_flip(from,to)} else {to.eq(from)} ) {
                     result += i;
-                    is_row = true;
+                    is_col = true;
                     // println!("Row: {i}, Flipped Row: {cmp_index}");
                     break 'outer;
                 }
             }
         }
-        if is_row {continue}
+        if is_col {continue}
 
-        let col: Vec<_> = pattern.columns().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
+        let rows: Vec<_> = pattern.columns().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
 
-        'outer:for i in 1..col.len() {
-            for cmp_index in 0..i.min(*&col[i..].len()){
-                if col[..i].iter().rev().zip(&col[i..])
+        'outer:for i in 1..rows.len() {
+            for cmp_index in 0..i.min(*&rows[i..].len()){
+                if rows[..i].iter().rev().zip(&rows[i..])
                     .enumerate()
                     .all(|(cmp_i, (from, to))| if cmp_i==cmp_index {eq_any_with_flip(from,to)} else {to.eq(from)} ) {
                     result += i*100;
@@ -109,7 +110,12 @@ pub fn part_2(pat: &str) -> usize {
 }
 
 fn eq_any_with_flip(a: &Vec<bool>, b: &Vec<bool>) -> bool {
-    (0..a.len()).any(|flip_i| {
-        (0..a.len()).all(|i| if flip_i==i { a[i]!=b[i] } else { a[i] == b[i] })
-    })
+    let mut misses: usize = 0;
+    for i in 0..a.len() {
+        if a[i]!=b[i]{
+            misses += 1;
+            if misses>1 {return false}
+        }
+    }
+    misses==1
 }
