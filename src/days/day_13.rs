@@ -22,32 +22,27 @@ pub fn part_1(pat: &str) -> usize {
         }
     }
 
-    let mut result: usize = 0;
-    for pattern in pats.iter(){
+
+    pats.iter().map(|pattern|{
         let cols: Vec<_> = pattern.rows().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
-        let mut is_col = false;
 
         for i in 1..cols.len() {
             if cols[..i].iter().rev().zip(&cols[i..])
                 .all(|(from, to)| to.eq(from)) {
-                result += i;
-                is_col = true;
-                break
+                return  i;
             }
         }
-        if is_col {continue}
 
         let rows: Vec<_> = pattern.columns().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
 
         for i in 1..rows.len() {
             if rows[..i].iter().rev().zip(&rows[i..])
                 .all(|(from, to)| to.eq(from)) {
-                result += i*100;
-                break
+                return  i*100;
             }
         }
-    }
-    result
+        0
+    }).sum()
 }
 
 
@@ -73,40 +68,31 @@ pub fn part_2(pat: &str) -> usize {
         }
     }
 
-    let mut result: usize = 0;
-    for pattern in pats.iter(){
+    pats.par_iter().map(|pattern|{
         let cols: Vec<_> = pattern.rows().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
-        let mut is_col = false;
 
-        'outer:for i in 1..cols.len() {
+        for i in 1..cols.len() {
             for cmp_index in 0..i.min(*&cols[i..].len()){
                 if cols[..i].iter().rev().zip(&cols[i..])
                     .enumerate()
                     .all(|(cmp_i, (from, to))| if cmp_i==cmp_index {eq_any_with_flip(from,to)} else {to.eq(from)} ) {
-                    result += i;
-                    is_col = true;
-                    // println!("Row: {i}, Flipped Row: {cmp_index}");
-                    break 'outer;
+                    return i;
                 }
             }
         }
-        if is_col {continue}
-
         let rows: Vec<_> = pattern.columns().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
 
-        'outer:for i in 1..rows.len() {
+        for i in 1..rows.len() {
             for cmp_index in 0..i.min(*&rows[i..].len()){
                 if rows[..i].iter().rev().zip(&rows[i..])
                     .enumerate()
                     .all(|(cmp_i, (from, to))| if cmp_i==cmp_index {eq_any_with_flip(from,to)} else {to.eq(from)} ) {
-                    result += i*100;
-                    // println!("Col: {i}, Flipped Col: {cmp_index}");
-                    break 'outer;
+                    return  i*100;
                 }
             }
         }
-    }
-    result
+        0
+    }).sum()
 }
 
 fn eq_any_with_flip(a: &Vec<bool>, b: &Vec<bool>) -> bool {
