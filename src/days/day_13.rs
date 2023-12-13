@@ -22,12 +22,12 @@ pub fn part_1(pat: &str) -> usize {
         }
     }
 
-
     pats.iter().map(|pattern|{
         let cols: Vec<_> = pattern.rows().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
 
         for i in 1..cols.len() {
-            if cols[..i].iter().rev().zip(&cols[i..])
+            if cols[..i].iter().rev()
+                .zip(&cols[i..])
                 .all(|(from, to)| to.eq(from)) {
                 return  i;
             }
@@ -36,7 +36,8 @@ pub fn part_1(pat: &str) -> usize {
         let rows: Vec<_> = pattern.columns().into_iter().map(|r| r.iter().map(|b|b.clone()).collect::<Vec<_>>()).collect();
 
         for i in 1..rows.len() {
-            if rows[..i].iter().rev().zip(&rows[i..])
+            if rows[..i].iter().rev()
+                .zip(&rows[i..])
                 .all(|(from, to)| to.eq(from)) {
                 return  i*100;
             }
@@ -73,7 +74,8 @@ pub fn part_2(pat: &str) -> usize {
 
         for i in 1..cols.len() {
             for cmp_index in 0..i.min(*&cols[i..].len()){
-                if cols[..i].iter().rev().zip(&cols[i..])
+                if cols[..i].iter().rev()
+                    .zip(&cols[i..])
                     .enumerate()
                     .all(|(cmp_i, (from, to))| if cmp_i==cmp_index {eq_any_with_flip(from,to)} else {to.eq(from)} ) {
                     return i;
@@ -84,7 +86,8 @@ pub fn part_2(pat: &str) -> usize {
 
         for i in 1..rows.len() {
             for cmp_index in 0..i.min(*&rows[i..].len()){
-                if rows[..i].iter().rev().zip(&rows[i..])
+                if rows[..i].iter().rev()
+                    .zip(&rows[i..])
                     .enumerate()
                     .all(|(cmp_i, (from, to))| if cmp_i==cmp_index {eq_any_with_flip(from,to)} else {to.eq(from)} ) {
                     return  i*100;
@@ -95,6 +98,7 @@ pub fn part_2(pat: &str) -> usize {
     }).sum()
 }
 
+#[inline]
 fn eq_any_with_flip(a: &Vec<bool>, b: &Vec<bool>) -> bool {
     let mut misses: usize = 0;
     for i in 0..a.len() {
