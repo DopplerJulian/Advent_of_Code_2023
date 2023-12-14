@@ -7,6 +7,7 @@ mod days;
 
 #[cfg(test)]
 mod tests {
+    use std::time::Instant;
     use super::*;
 
 
@@ -345,6 +346,32 @@ mod tests {
         let result = days::day_13::part_2(pzzl.as_str());
         // println!("{result}");
         assert_eq!(result, 36735);
+    }
+
+    #[test]
+    fn day14p1() {
+        let pzzl = test_utils::read_file_as_string("./test_data/day_14_e.txt").unwrap();
+        let result = days::day_14::part_1(pzzl.as_str());
+        assert_eq!(result, 136);
+
+        let pzzl = test_utils::read_file_as_string("./test_data/day_14_p.txt").unwrap();
+        let result = days::day_14::part_1(pzzl.as_str());
+        // println!("{result}");
+        assert_eq!(result, 110407);
+    }
+
+    #[test]
+    fn day14p2() {
+        let pzzl = test_utils::read_file_as_string("./test_data/day_14_e.txt").unwrap();
+        let result = days::day_14::part_2(pzzl.as_str());
+        assert_eq!(result, 64);
+
+        let pzzl = test_utils::read_file_as_string("./test_data/day_14_p.txt").unwrap();
+        let start = Instant::now();
+        let result = days::day_14::part_2(pzzl.as_str());
+        println!("Time taken for calculation: {:.2?}", start.elapsed());
+        // println!("{result}");
+        assert_eq!(result, 87273);
     }
 }
 
