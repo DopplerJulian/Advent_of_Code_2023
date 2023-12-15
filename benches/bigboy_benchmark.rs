@@ -16,11 +16,11 @@ fn day_15_silver_benchmark(c: &mut Criterion) {
     );
 }
 fn day_15_gold_benchmark(c: &mut Criterion) {
-    let bigboy = test_utils::read_file_as_string(r"./big_bois/bb_d15.txt").unwrap();
+    let bigboy = test_utils::read_file_as_string(r"./big_bois/berb_d15.txt").unwrap();
 
     c.bench_function(
         "calculate gold",
-        |b| b.iter(|| day_15::part_2(&bigboy))
+        |b| b.iter(|| day_15::part_2_speedy(&bigboy))
     );
 }
 

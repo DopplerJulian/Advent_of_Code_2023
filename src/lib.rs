@@ -389,13 +389,13 @@ mod tests {
     #[test]
     fn day15p2() {
         let pzzl = test_utils::read_file_as_string("./test_data/day_15_e.txt").unwrap();
-        let result = days::day_15::part_2(pzzl.as_str());
+        let result = days::day_15::part_2_speedy(pzzl.as_str());
         assert_eq!(result, 145);
 
         let pzzl = test_utils::read_file_as_string("./test_data/day_15_p.txt").unwrap();
-        let result = days::day_15::part_2(pzzl.as_str());
-        println!("{result}");
-        // assert_eq!(result, 494980);
+        let result = days::day_15::part_2_speedy(pzzl.as_str());
+        // println!("{result}");
+        assert_eq!(result, 247933);
     }
 }
 
