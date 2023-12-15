@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use indexmap::IndexMap;
 use rayon::prelude::*;
 use array_init::array_init;
+use chashmap_next::CHashMap;
 
 #[allow(unused)]
 pub fn part_1(sequence: &str) -> usize {
@@ -48,6 +49,7 @@ pub fn part_2_speedy(sequence: &str) -> usize {
 
     sequence.split(',').enumerate().for_each(|(instruction_i,lens)| {
         let rm = lens.chars().last().unwrap()=='-';
+        let instruction_i = instruction_i+1;
         let label = if rm { &lens[..lens.len()-1] } else { &lens[..lens.len()-2] };
         let box_i = hash(label);
 
@@ -70,10 +72,66 @@ pub fn part_2_speedy(sequence: &str) -> usize {
             .map(|l|l)
             .collect();
 
-        lenses.sort_unstable_by(|a,b| a.0.cmp(&b.0));
+        lenses.par_sort_unstable_by_key(|e| e.0);
 
         lenses.iter().enumerate().map(|(lens_i, (_,focal))|{
             (box_index + 1) * (lens_i + 1) * focal
         }).sum::<usize>()
     }).sum()
+}
+
+#[allow(unused)]
+pub fn part_2_par(sequence: &str) -> usize {
+    //  boxes[(box_instructions<label, (instruction_index,focal_length)>, was_inserted_to)]
+    //  instruction index starts with 1, 0 means the item is removed
+    let mut boxes: [(CHashMap<&str, (i64, usize)>); 256] = array_init(|_| (CHashMap::new()));
+
+    sequence.split(',').enumerate().par_bridge().for_each(|(instruction_i,lens)| {
+        let rm = lens.chars().last().unwrap()=='-';
+        let label = if rm { &lens[..lens.len()-1] } else { &lens[..lens.len()-2] };
+        let box_i = hash(label);
+
+        if rm {
+            if let Some(mut entry) = boxes[box_i].get_mut(label) {
+                if (entry.0.abs() as usize) < instruction_i {
+                    entry.0 = -(instruction_i as i64);
+                }
+            }
+            boxes[box_i].alter(label, |entry|{
+                if let Some(mut e) = entry {
+                    e.0 = -(instruction_i as i64);
+                    Some(e)
+                } else { None }
+            });
+        } else {
+            let focal = lens[lens.len()-1..].parse::<usize>().unwrap();
+            boxes[box_i].alter(label, |entry|{
+                match entry {
+                    Some(e) => {
+                        if e.0.abs() < (instruction_i as i64){
+                            Some((if e.0.is_negative() {instruction_i as i64} else {e.0} , focal))
+                        } else { Some(e) }
+                    },
+                    None => Some((instruction_i as i64,focal)),
+                }
+            });
+        }
+    });
+
+    boxes.into_par_iter().enumerate()
+        .filter(|(_, b)| !b.is_empty())
+        .map(|(box_index,(current_box))| {
+
+            let mut lenses: Vec<(i64,usize)> = current_box.into_iter()
+                .filter(|(_,l)| !l.0.is_negative())
+                .map(|(_,l)|l.clone())
+                .collect();
+
+            lenses.sort_unstable_by(|a,b| a.0.cmp(&b.0));
+
+            lenses.iter().enumerate().map(|(lens_i, (_,focal))|{
+                // println!("Box: {box_index},Lens: {lens_i}, Focal: {focal}");
+                (box_index + 1) * (lens_i + 1) * focal
+            }).sum::<usize>()
+        }).sum()
 }
