@@ -355,7 +355,9 @@ mod tests {
         assert_eq!(result, 136);
 
         let pzzl = test_utils::read_file_as_string("./test_data/day_14_p.txt").unwrap();
+        let start = Instant::now();
         let result = days::day_14::part_1(pzzl.as_str());
+        println!("Time taken for calculation: {:.2?}", start.elapsed());
         // println!("{result}");
         assert_eq!(result, 110407);
     }
@@ -367,9 +369,7 @@ mod tests {
         assert_eq!(result, 64);
 
         let pzzl = test_utils::read_file_as_string("./test_data/day_14_p.txt").unwrap();
-        let start = Instant::now();
         let result = days::day_14::part_2(pzzl.as_str());
-        println!("Time taken for calculation: {:.2?}", start.elapsed());
         // println!("{result}");
         assert_eq!(result, 87273);
     }
@@ -547,7 +547,7 @@ mod big_bois {
     }
 
     #[test]
-    fn bigger13p1() {
+    fn big13p1() {
         let start = Instant::now();
         let pzzl = test_utils::read_file_as_string(r"./big_bois/bb_d13.txt").unwrap();
         let time = start.elapsed();
@@ -562,13 +562,28 @@ mod big_bois {
     }
 
     #[test]
-    fn bigger13p2() {
+    fn big13p2() {
         let start = Instant::now();
         let pzzl = test_utils::read_file_as_string(r"./big_bois/bb_d13.txt").unwrap();
         let time = start.elapsed();
 
         let start2 = Instant::now();
         let result = days::day_13::part_2(pzzl.as_str());
+        let time2 = start2.elapsed();
+
+        println!("{}", result);
+        println!("Time taken for calculation: {:.2?}", time2);
+        println!("Time taken for read: {:.2?}", time);
+    }
+
+    #[test]
+    fn big14p1() {
+        let start = Instant::now();
+        let pzzl = test_utils::read_file_as_string(r"./big_bois/bb_d14.txt").unwrap();
+        let time = start.elapsed();
+
+        let start2 = Instant::now();
+        let result = days::day_14::part_1_large(pzzl.as_str());
         let time2 = start2.elapsed();
 
         println!("{}", result);

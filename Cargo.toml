@@ -15,4 +15,4 @@ repository = "https://github.com/DopplerJulian/Advent_of_Code_2023"
 [dependencies]
 rayon = "1.8.0"
 mimalloc = "*"
-ndarray = "0.15"
+ndarray = { version = "0.15", features = ["rayon"] }

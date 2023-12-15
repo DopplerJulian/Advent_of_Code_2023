@@ -1,43 +1,50 @@
 use std::collections::HashMap;
 use rayon::prelude::*;
-// use ndarray::*;
+use ndarray::*;
 
+#[allow(unused)]
+pub fn part_1_large(rocks: &str) -> usize {
+    let mut ncols = 0usize;
+    let mut nrows = 0usize;
+    let mut round_rocks: Vec<bool> = Vec::new();
+    let mut rock_mask: Vec<bool> = Vec::new();
 
-// #[allow(unused)]
-// pub fn part_1_large(rocks: &str) -> usize {
-//     let mut ncols = 0usize;
-//     let mut nrows = 0usize;
-//     let mut round_rocks: Vec<bool> = Vec::new();
-//     let mut rock_mask: Vec<bool> = Vec::new();
-//
-//     for n in rocks.lines() {
-//         if ncols == 0 {ncols = n.len()}
-//         let mut round: Vec<bool> = Vec::with_capacity(n.len());
-//         let mut mask: Vec<bool> = Vec::with_capacity(n.len());
-//
-//         for c in n.chars(){
-//             round.push(c=='O');
-//             mask.push(c=='#');
-//         }
-//         round_rocks.extend(round);
-//         rock_mask.extend(mask);
-//         nrows += 1;
-//     }
-//
-//     let mut round_rocks: Array2<bool> = Array2::from_shape_vec((nrows, ncols), round_rocks).unwrap();
-//     let rock_mask: Array2<bool> = Array2::from_shape_vec((nrows, ncols), rock_mask).unwrap();
-//
-//
-//     for i in 0..round_rocks.len()-1{
-//         let to_old = round_rocks.row(i);
-//         let from_old = round_rocks.row(i+1);
-//         let to_mask = rock_mask.row(i);
-//         let to_new = (&to_old | &from_old) & !&to_mask;
+    for n in rocks.lines() {
+        if ncols == 0 {ncols = n.len()}
+        let mut round: Vec<bool> = Vec::with_capacity(n.len());
+        let mut mask: Vec<bool> = Vec::with_capacity(n.len());
 
-        // round_rocks.row_mut(i+1) = (&from_old & &to_old) | (&from_old & &to_mask);
-//     }
-//     0
-// }
+        for c in n.chars(){
+            round.push(c=='O');
+            mask.push(c=='#');
+        }
+        round_rocks.extend(round);
+        rock_mask.extend(mask);
+        nrows += 1;
+    }
+
+    let mut round_rocks: Array2<bool> = Array2::from_shape_vec((nrows, ncols), round_rocks).unwrap();
+    let rock_mask: Array2<bool> = Array2::from_shape_vec((nrows, ncols), rock_mask).unwrap();
+
+    round_rocks.axis_iter_mut(Axis(1)).into_par_iter().enumerate()
+        .for_each(|(col_i, mut col)| {
+            let mut changed = true;
+            while changed {
+                changed = false;
+                for row in 0..nrows-1{
+                    if !rock_mask[[row,col_i]] && !col[row] && col[row+1] {
+                        col[row] = !col[row];
+                        col[row+1] = !col[row+1];
+                        changed = true;
+                    }
+                }
+            }
+        });
+
+    round_rocks.rows().into_iter().enumerate()
+        .map(|(i,n)| (nrows-i) * n.iter().filter(|&b| *b).count() as usize)
+        .sum()
+}
 
 
 // max cols is 128
@@ -160,6 +167,9 @@ pub fn part_2(rocks: &str) -> usize {
 
         if let Some(val) = cycle_trail.get(&round_rocks) {
             let cycle_length = count-val;
+            println!("loop: {cycle_length}");
+            println!("loop start: {val}");
+            println!("loop repeat: {count}");
             let target_state: usize = ((1_000_000_000-val) % cycle_length) + val;
             return cycle_trail.iter().find(|(_,&v)| v==target_state).unwrap().0
                 .iter().enumerate()
