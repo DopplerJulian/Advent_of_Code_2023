@@ -20,7 +20,7 @@ fn day_15_gold_benchmark(c: &mut Criterion) {
 
     c.bench_function(
         "calculate gold",
-        |b| b.iter(|| day_15::part_2_speedy(&bigboy))
+        |b| b.iter(|| day_15::part_2(&bigboy))
     );
 }
 

@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use indexmap::IndexMap;
 use rayon::prelude::*;
 use array_init::array_init;
 use chashmap_next::CHashMap;
@@ -18,30 +17,6 @@ fn hash(to_hash: &str) -> usize {
 
 #[allow(unused)]
 pub fn part_2(sequence: &str) -> usize {
-    let mut boxes: [IndexMap<&str, usize>; 256] = array_init(|_| IndexMap::with_capacity(8));
-
-    sequence.split(',').for_each(|lens| {
-        let rm = lens.chars().last().unwrap()=='-';
-        let label = if rm { &lens[..lens.len()-1] } else { &lens[..lens.len()-2] };
-        let box_i = hash(label);
-
-        if rm {
-            boxes[box_i].shift_remove(label);
-        } else {
-            boxes[box_i].insert(label, lens[lens.len()-1..].parse::<usize>().unwrap());
-        }
-    });
-
-    boxes.par_iter().enumerate()
-        .filter(|(_, b)| !b.is_empty())
-        .map(|(i, b)| {
-            b.iter().enumerate().map(|(l_i, (_, f))| (i + 1) * (l_i + 1) * f).sum::<usize>()
-        })
-        .sum()
-}
-
-#[allow(unused)]
-pub fn part_2_speedy(sequence: &str) -> usize {
     //  boxes[(box_instructions<label, (instruction_index,focal_length)>, was_inserted_to)]
     //  instruction index starts with 1, 0 means the item is removed
     let mut boxes: [(HashMap<&str, (usize,usize)>); 256] = array_init(|_| (HashMap::new()));

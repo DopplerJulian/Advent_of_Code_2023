@@ -16,7 +16,6 @@ repository = "https://github.com/DopplerJulian/Advent_of_Code_2023"
 rayon = "1.8.0"
 mimalloc = "*"
 ndarray = { version = "0.15", features = ["rayon"] }
-indexmap = "2"
 array-init = "2.1"
 chashmap-next = "2.2.3"
 
