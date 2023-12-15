@@ -1,5 +1,5 @@
-mod test_utils;
-mod days;
+pub mod test_utils;
+pub mod days;
 
 // use mimalloc::MiMalloc;
 // #[global_allocator]
