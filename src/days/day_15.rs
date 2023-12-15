@@ -6,13 +6,13 @@ use chashmap_next::CHashMap;
 #[allow(unused)]
 pub fn part_1(sequence: &str) -> usize {
     sequence.par_split(',').map(|to_hash| {
-        to_hash.chars().fold(0usize,|acc,e| ((acc+(e as usize))*17)%256 )
+        to_hash.bytes().fold(0usize,|acc,e| ((acc+(e as usize))*17)%256 )
     }).sum::<usize>()
 }
 
 #[inline]
 fn hash(to_hash: &str) -> usize {
-    to_hash.chars().fold(0usize,|acc,e| ((acc+(e as usize))*17)%256 )
+    to_hash.bytes().fold(0usize,|acc,e| ((acc+(e as usize))*17)%256 )
 }
 
 #[allow(unused)]
