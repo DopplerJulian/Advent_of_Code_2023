@@ -1,5 +1,4 @@
 use std::collections::{BTreeMap, VecDeque};
-use naga::FastHashMap;
 use ndarray::{Array2, ArrayViewMut, Ix1, s};
 use rayon::prelude::*;
 
