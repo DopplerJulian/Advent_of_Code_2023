@@ -1,6 +1,7 @@
 use std::collections::{BTreeMap, VecDeque};
 use naga::FastHashMap;
 use ndarray::{Array2, ArrayViewMut, Ix1, s};
+use rayon::prelude::*;
 
 #[derive(Eq, PartialEq,Ord, PartialOrd, Copy, Clone, Debug)]
 enum Element{
@@ -67,25 +68,64 @@ struct Beam {
 
 
 pub fn part_1(tiles: &str) -> usize{
-    let mut row_elements: FastHashMap<usize,BTreeMap<usize,Element>> = FastHashMap::default();
-    let mut col_elements: FastHashMap<usize,BTreeMap<usize,Element>> = FastHashMap::default();
+    let nrows: usize = tiles.lines().count();
+    let ncols: usize = tiles.lines().next().unwrap().len();
 
-    let mut energized: Array2<EnergyOrigin> = Array2::from_elem((tiles.lines().count(), tiles.lines().next().unwrap().len()), EnergyOrigin::new());
-    let nrows: usize = energized.nrows();
-    let ncols: usize = energized.ncols();
+    let mut row_elements: Vec<BTreeMap<usize,Element>> = vec![BTreeMap::new() ;ncols];
+    let mut col_elements: Vec<BTreeMap<usize,Element>> = vec![BTreeMap::new() ;nrows];
 
     for (ri, row) in tiles.lines().enumerate() {
         for (ci, col) in row.char_indices() {
             if let Some(element) = Element::from(col) {
-                row_elements.entry(ri).or_insert(BTreeMap::new()).insert(ci, element.clone());
-                col_elements.entry(ci).or_insert(BTreeMap::new()).insert(ri, element);
+                row_elements[ri].insert(ci, element.clone());
+                col_elements[ci].insert(ri, element);
             }
         }
     }
 
+    calculate(&row_elements,&col_elements,nrows,ncols, Beam{start_row:0,start_col:0,origin:BeamOrigin::Left})
+}
+
+pub fn part_2(tiles: &str) -> usize{
+    let nrows: usize = tiles.lines().count();
+    let ncols: usize = tiles.lines().next().unwrap().len();
+
+    let mut row_elements: Vec<BTreeMap<usize,Element>> = vec![BTreeMap::new() ;ncols];
+    let mut col_elements: Vec<BTreeMap<usize,Element>> = vec![BTreeMap::new() ;nrows];
+
+    for (ri, row) in tiles.lines().enumerate() {
+        for (ci, col) in row.char_indices() {
+            if let Some(element) = Element::from(col) {
+                row_elements[ri].insert(ci, element.clone());
+                col_elements[ci].insert(ri, element);
+            }
+        }
+    }
+
+    let mleft: usize = (0..nrows).into_iter().par_bridge().map(|i| {
+        calculate(&row_elements,&col_elements,nrows,ncols, Beam{start_row:i,start_col:0,origin:BeamOrigin::Left})
+    }).max().unwrap();
+    let mup: usize = (0..ncols).into_iter().par_bridge().map(|i| {
+        calculate(&row_elements,&col_elements,nrows,ncols, Beam{start_row:0,start_col:i,origin:BeamOrigin::Up})
+    }).max().unwrap();
+    let mright: usize = (0..nrows).into_iter().par_bridge().map(|i| {
+        calculate(&row_elements,&col_elements,nrows,ncols, Beam{start_row:i,start_col:ncols-1,origin:BeamOrigin::Right})
+    }).max().unwrap();
+    let mdown: usize = (0..ncols).into_iter().par_bridge().map(|i| {
+        calculate(&row_elements,&col_elements,nrows,ncols, Beam{start_row:nrows-1,start_col:i,origin:BeamOrigin::Right})
+    }).max().unwrap();
+    mleft.max(mright).max(mup).max(mdown)
+}
+
+
+fn calculate(row_elements: &Vec<BTreeMap<usize,Element>>,
+             col_elements: &Vec<BTreeMap<usize,Element>>,
+             nrows: usize, ncols: usize, start_beam: Beam) -> usize{
+    let mut energized: Array2<EnergyOrigin> = Array2::from_elem((nrows, ncols), EnergyOrigin::new());
+
     // ((start_row,start_col), origin)
     let mut beams: VecDeque<Beam> = VecDeque::new();
-    beams.push_back(Beam{start_row:0,start_col:0,origin:BeamOrigin::Left});
+    beams.push_back(start_beam);
 
     while let Some(current_beam) = beams.pop_front() {
         // println!(" ");
@@ -97,16 +137,16 @@ pub fn part_1(tiles: &str) -> usize{
 
         let intersection = match current_beam.origin {
             BeamOrigin::Left => {
-                row_elements[&current_beam.start_row].range(current_beam.start_col..).find(|e|e.1!=&Element::SplitterHor)
+                row_elements[current_beam.start_row].range(current_beam.start_col..).find(|e|e.1!=&Element::SplitterHor)
             },
             BeamOrigin::Right => {
-                row_elements[&current_beam.start_row].range(..=current_beam.start_col).rev().find(|e|e.1!=&Element::SplitterHor)
+                row_elements[current_beam.start_row].range(..=current_beam.start_col).rev().find(|e|e.1!=&Element::SplitterHor)
             },
             BeamOrigin::Up => {
-                col_elements[&current_beam.start_col].range(current_beam.start_row..).find(|e|e.1!=&Element::SplitterVert)
+                col_elements[current_beam.start_col].range(current_beam.start_row..).find(|e|e.1!=&Element::SplitterVert)
             },
             BeamOrigin::Down => {
-                col_elements[&current_beam.start_col].range(..=current_beam.start_row).rev().find(|e|e.1!=&Element::SplitterVert)
+                col_elements[current_beam.start_col].range(..=current_beam.start_row).rev().find(|e|e.1!=&Element::SplitterVert)
             },
         };
 
