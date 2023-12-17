@@ -1,12 +1,12 @@
-use std::collections::HashMap;
 use rayon::prelude::*;
 use array_init::array_init;
 use chashmap_next::CHashMap;
+use naga::FastHashMap;
 
 #[allow(unused)]
 pub fn part_1(sequence: &str) -> usize {
     sequence.par_split(',').map(|to_hash| {
-        to_hash.bytes().fold(0usize,|acc,e| ((acc+(e as usize))*17)%256 )
+        to_hash.bytes().fold(0,|acc,e| ((acc+(e as usize))*17)%256 )
     }).sum::<usize>()
 }
 
@@ -19,7 +19,7 @@ fn hash(to_hash: &str) -> usize {
 pub fn part_2(sequence: &str) -> usize {
     //  boxes[(box_instructions<label, (instruction_index,focal_length)>, was_inserted_to)]
     //  instruction index starts with 1, 0 means the item is removed
-    let mut boxes: [(HashMap<&str, (usize,usize)>); 256] = array_init(|_| (HashMap::new()));
+    let mut boxes: [(FastHashMap<&str, (usize,usize)>); 256] = array_init(|_| (FastHashMap::default()));
     // let mut hash_cache: HashMap<&str, usize> = HashMap::with_capacity(128);
 
     sequence.split(',').enumerate().for_each(|(instruction_i,lens)| {
@@ -31,7 +31,7 @@ pub fn part_2(sequence: &str) -> usize {
         if rm {
             boxes[box_i].entry(label).and_modify(|v| v.0 = 0);
         } else {
-            let focal = lens[lens.len()-1..].parse::<usize>().unwrap();
+            let focal = lens.chars().last().unwrap().to_digit(10).unwrap() as usize;
             let entry = boxes[box_i].entry(label).or_insert((instruction_i,focal));
             entry.1 = focal;
             if entry.0 == 0 {entry.0=instruction_i}
