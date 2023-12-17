@@ -2,13 +2,12 @@ use std::cmp::{Ordering, Reverse};
 use std::collections::BinaryHeap;
 use ndarray::Array2;
 
-
 #[allow(unused)]
 pub fn part_1(city: &str) -> usize {
     let nrows = city.lines().count();
     let ncols = city.lines().next().unwrap().len();
     let mut blocks: Array2<u8> = Array2::zeros((nrows,ncols));
-    let mut visited: Array2<Visited>  = Array2::from_elem((nrows,ncols), Visited::default());
+    let mut visited: Array2<Visited>  = Array2::from_elem((nrows,ncols), Visited::default()); // could use u8 instead of bool array
 
     for (row_i, line) in city.lines().enumerate() {
         for (col_i, c) in line.char_indices() {
