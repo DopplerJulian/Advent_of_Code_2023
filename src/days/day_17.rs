@@ -17,11 +17,11 @@ pub fn part_1(city: &str) -> usize {
     }
 
     let mut priority_queue = BinaryHeap::new();
-    priority_queue.push(Reverse(Crucible{cost: blocks[[0,1]].clone() as usize, origin: Origin::Left, position: Position{x:1,y:0}, time_to_live: 2}));
-    priority_queue.push(Reverse(Crucible{cost: blocks[[1,0]].clone() as usize, origin: Origin::Left, position: Position{x:0,y:1}, time_to_live: 2}));
+    priority_queue.push(Reverse(Crucible{cost: blocks[[0,1]] as usize, origin: Origin::Left, position: Position{x:1,y:0}, time_to_live: 2}));
+    priority_queue.push(Reverse(Crucible{cost: blocks[[1,0]] as usize, origin: Origin::Left, position: Position{x:0,y:1}, time_to_live: 2}));
 
     while let Some(crucible) = priority_queue.pop() {
-        let crucible = crucible.0;
+        let mut crucible = crucible.0;
         if visited[[crucible.position.y as usize, crucible.position.x as usize]].did_visit(&crucible.origin, crucible.time_to_live) {
             continue
         }
@@ -29,14 +29,6 @@ pub fn part_1(city: &str) -> usize {
             return crucible.cost
         }
 
-        if crucible.time_to_live != 0{
-            if let Some(next_pos) = crucible.next(nrows,ncols) {
-                let next_row = next_pos.y as usize;
-                let next_col = next_pos.x as usize;
-                let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin, position: next_pos, time_to_live: crucible.time_to_live-1};
-                priority_queue.push(Reverse(n))
-            }
-        }
         if let Some(next_pos) = crucible.next_left(nrows,ncols) {
             let next_row = next_pos.y as usize;
             let next_col = next_pos.x as usize;
@@ -48,6 +40,18 @@ pub fn part_1(city: &str) -> usize {
             let next_col = next_pos.x as usize;
             let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin.rotate(true), position: next_pos, time_to_live: 2};
             priority_queue.push(Reverse(n))
+        }
+
+        if crucible.time_to_live != 0{
+            if let Some(next_pos) = crucible.next(nrows,ncols) {
+                let next_row = next_pos.y as usize;
+                let next_col = next_pos.x as usize;
+                crucible.cost = crucible.cost + blocks[[next_row,next_col]] as usize;
+                crucible.time_to_live = crucible.time_to_live-1;
+                crucible.position = next_pos;
+                let n = crucible;
+                priority_queue.push(Reverse(n))
+            }
         }
     }
 
@@ -68,8 +72,8 @@ pub fn part_2(city: &str) -> usize {
     }
 
     let mut priority_queue = BinaryHeap::new();
-    priority_queue.push(Reverse(Crucible{cost: blocks[[0,1]].clone() as usize, origin: Origin::Left, position: Position{x:1,y:0}, time_to_live: 9}));
-    priority_queue.push(Reverse(Crucible{cost: blocks[[1,0]].clone() as usize, origin: Origin::Left, position: Position{x:0,y:1}, time_to_live: 9}));
+    priority_queue.push(Reverse(Crucible{cost: blocks[[0,1]] as usize, origin: Origin::Left, position: Position{x:1,y:0}, time_to_live: 9}));
+    priority_queue.push(Reverse(Crucible{cost: blocks[[1,0]] as usize, origin: Origin::Left, position: Position{x:0,y:1}, time_to_live: 9}));
 
     while let Some(crucible) = priority_queue.pop() {
         let crucible = crucible.0;
