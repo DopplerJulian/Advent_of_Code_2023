@@ -1,7 +1,7 @@
-use std::cmp::Ordering;
-use std::cmp::Reverse;
+use std::cmp::{Ordering, Reverse};
 use std::collections::BinaryHeap;
 use ndarray::Array2;
+
 
 #[allow(unused)]
 pub fn part_1(city: &str) -> usize {
