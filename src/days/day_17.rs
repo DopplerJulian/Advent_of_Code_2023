@@ -17,8 +17,8 @@ pub fn part_1(city: &str) -> usize {
     }
 
     let mut priority_queue = BinaryHeap::new();
-    priority_queue.push(Reverse(Crucible{cost: blocks[[0,1]].clone() as usize, origin: Origin::Left, position: Position{x:1,y:0}, time_to_live: 2 }));
-    priority_queue.push(Reverse(Crucible{cost: blocks[[1,0]].clone() as usize, origin: Origin::Left, position: Position{x:0,y:1}, time_to_live: 2 }));
+    priority_queue.push(Reverse(Crucible{cost: blocks[[0,1]].clone() as usize, origin: Origin::Left, position: Position{x:1,y:0}, time_to_live: 2}));
+    priority_queue.push(Reverse(Crucible{cost: blocks[[1,0]].clone() as usize, origin: Origin::Left, position: Position{x:0,y:1}, time_to_live: 2}));
 
     while let Some(crucible) = priority_queue.pop() {
         let crucible = crucible.0;
@@ -33,20 +33,72 @@ pub fn part_1(city: &str) -> usize {
             if let Some(next_pos) = crucible.next(nrows,ncols) {
                 let next_row = next_pos.y as usize;
                 let next_col = next_pos.x as usize;
-                let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin, position: next_pos, time_to_live: crucible.time_to_live-1 };
+                let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin, position: next_pos, time_to_live: crucible.time_to_live-1};
                 priority_queue.push(Reverse(n))
             }
         }
         if let Some(next_pos) = crucible.next_left(nrows,ncols) {
             let next_row = next_pos.y as usize;
             let next_col = next_pos.x as usize;
-            let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin.rotate(false), position: next_pos, time_to_live: 2 };
+            let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin.rotate(false), position: next_pos, time_to_live: 2};
             priority_queue.push(Reverse(n))
         }
         if let Some(next_pos) = crucible.next_right(nrows,ncols) {
             let next_row = next_pos.y as usize;
             let next_col = next_pos.x as usize;
-            let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin.rotate(true), position: next_pos, time_to_live: 2 };
+            let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin.rotate(true), position: next_pos, time_to_live: 2};
+            priority_queue.push(Reverse(n))
+        }
+    }
+
+    panic!("Path not found!")
+}
+
+#[allow(unused)]
+pub fn part_2(city: &str) -> usize {
+    let nrows = city.lines().count();
+    let ncols = city.lines().next().unwrap().len();
+    let mut blocks: Array2<u8> = Array2::zeros((nrows,ncols));
+    let mut visited: Array2<Visited>  = Array2::from_elem((nrows,ncols), Visited::default());
+
+    for (row_i, line) in city.lines().enumerate() {
+        for (col_i, c) in line.char_indices() {
+            blocks[[row_i,col_i]] = c.to_digit(10).unwrap() as u8; // could cast directly from byte
+        }
+    }
+
+    let mut priority_queue = BinaryHeap::new();
+    priority_queue.push(Reverse(Crucible{cost: blocks[[0,1]].clone() as usize, origin: Origin::Left, position: Position{x:1,y:0}, time_to_live: 9}));
+    priority_queue.push(Reverse(Crucible{cost: blocks[[1,0]].clone() as usize, origin: Origin::Left, position: Position{x:0,y:1}, time_to_live: 9}));
+
+    while let Some(crucible) = priority_queue.pop() {
+        let crucible = crucible.0;
+        if visited[[crucible.position.y as usize, crucible.position.x as usize]].did_visit(&crucible.origin, crucible.time_to_live) {
+            continue
+        }
+        if crucible.time_to_live <= 6 && crucible.position.x as usize == ncols-1 && crucible.position.y as usize == nrows-1 {
+            return crucible.cost
+        }
+
+        if crucible.time_to_live != 0{
+            if let Some(next_pos) = crucible.next(nrows,ncols) {
+                let next_row = next_pos.y as usize;
+                let next_col = next_pos.x as usize;
+                let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin, position: next_pos, time_to_live: crucible.time_to_live-1};
+                priority_queue.push(Reverse(n))
+            }
+        }
+        if crucible.time_to_live > 6 {continue}
+        if let Some(next_pos) = crucible.next_left(nrows,ncols) {
+            let next_row = next_pos.y as usize;
+            let next_col = next_pos.x as usize;
+            let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin.rotate(false), position: next_pos, time_to_live: 9};
+            priority_queue.push(Reverse(n))
+        }
+        if let Some(next_pos) = crucible.next_right(nrows,ncols) {
+            let next_row = next_pos.y as usize;
+            let next_col = next_pos.x as usize;
+            let n = Crucible{cost: crucible.cost + blocks[[next_row,next_col]] as usize, origin: crucible.origin.rotate(true), position: next_pos, time_to_live: 9};
             priority_queue.push(Reverse(n))
         }
     }
@@ -57,7 +109,7 @@ pub fn part_1(city: &str) -> usize {
 #[derive(Eq, Copy, Clone, Debug)]
 struct Crucible {
     cost: usize,
-    time_to_live: u8, // 0-2
+    time_to_live: u8, // 0-2 | 0-9
     origin: Origin,
     position: Position,
 } impl Crucible {
@@ -159,49 +211,28 @@ impl Position {
 
 #[derive(Clone)]
 struct Visited{
-    left: (bool, bool, bool), // 0, 1, 2
-    right: (bool, bool, bool),
-    top: (bool, bool, bool),
-    bottom: (bool, bool, bool),
+    left: [bool; 10], // 0, 1, 2
+    right: [bool; 10],
+    top: [bool; 10],
+    bottom: [bool; 10],
 } impl Visited {
     fn default() -> Self {
-        let b = (false, false, false);
-        Visited {left: b, right: b, top: b, bottom: b}
+        Visited {left: [false; 10], right: [false; 10], top: [false; 10], bottom: [false; 10]}
     }
 
     fn did_visit(&mut self, from: &Origin, ttl: u8) -> bool {
         match from {
             Origin::Left => {
-                match ttl {
-                    0 => if self.left.0 {return true} else {self.left.0 = true},
-                    1 => if self.left.1 {return true} else {self.left.1 = true},
-                    2 => if self.left.2 {return true} else {self.left.2 = true},
-                    _ => (),
-                }
+                if self.left[ttl as usize] {return true} else {self.left[ttl as usize] = true}
             },
             Origin::Right => {
-                match ttl {
-                    0 => if self.right.0 {return true} else {self.right.0 = true},
-                    1 => if self.right.1 {return true} else {self.right.1 = true},
-                    2 => if self.right.2 {return true} else {self.right.2 = true},
-                    _ => (),
-                }
+                if self.right[ttl as usize] {return true} else {self.right[ttl as usize] = true}
             },
             Origin::Top => {
-                match ttl {
-                    0 => if self.top.0 {return true} else {self.top.0 = true},
-                    1 => if self.top.1 {return true} else {self.top.1 = true},
-                    2 => if self.top.2 {return true} else {self.top.2 = true},
-                    _ => (),
-                }
+                if self.top[ttl as usize] {return true} else {self.top[ttl as usize] = true}
             },
             Origin::Bottom => {
-                match ttl {
-                    0 => if self.bottom.0 {return true} else {self.bottom.0 = true},
-                    1 => if self.bottom.1 {return true} else {self.bottom.1 = true},
-                    2 => if self.bottom.2 {return true} else {self.bottom.2 = true},
-                    _ => (),
-                }
+                if self.bottom[ttl as usize] {return true} else {self.bottom[ttl as usize] = true}
             },
         }
         false
