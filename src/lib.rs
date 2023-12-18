@@ -454,6 +454,18 @@ mod tests {
 
         let pzzl = test_utils::read_file_as_string("./test_data/day_18_p.txt").unwrap();
         let result = days::day_18::part_1(pzzl.as_str());
+        // println!("{result}");
+        assert_eq!(result, 76387);
+    }
+
+    #[test]
+    fn day18p2() {
+        let pzzl = test_utils::read_file_as_string("./test_data/day_18_e.txt").unwrap();
+        let result = days::day_18::part_2(pzzl.as_str());
+        assert_eq!(result, 952408144115);
+
+        let pzzl = test_utils::read_file_as_string("./test_data/day_18_p.txt").unwrap();
+        let result = days::day_18::part_2(pzzl.as_str());
         println!("{result}");
         // assert_eq!(result, 1266);
     }
