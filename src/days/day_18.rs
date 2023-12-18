@@ -1,8 +1,7 @@
 use std::ops::Div;
-// use rayon::prelude::*;
 
 pub fn part_1(plan: &str) -> usize {
-    let mut last_point = (0i32,0i32);
+    let mut last_point = (0i32, 0i32);
     let mut area = 0i32;
     let mut perimeter = 0i32;
 

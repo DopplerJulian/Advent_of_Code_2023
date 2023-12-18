@@ -1,3 +1,4 @@
+// #![feature(portable_simd)]
 pub mod test_utils;
 pub mod days;
 
