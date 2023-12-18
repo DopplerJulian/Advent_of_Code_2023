@@ -466,8 +466,8 @@ mod tests {
 
         let pzzl = test_utils::read_file_as_string("./test_data/day_18_p.txt").unwrap();
         let result = days::day_18::part_2(pzzl.as_str());
-        println!("{result}");
-        // assert_eq!(result, 1266);
+        // println!("{result}");
+        assert_eq!(result, 250022188522074);
     }
 }
 
