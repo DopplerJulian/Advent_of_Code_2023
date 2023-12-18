@@ -445,6 +445,18 @@ mod tests {
         // println!("{result}");
         assert_eq!(result, 1266);
     }
+
+    #[test]
+    fn day18p1() {
+        let pzzl = test_utils::read_file_as_string("./test_data/day_18_e.txt").unwrap();
+        let result = days::day_18::part_1(pzzl.as_str());
+        assert_eq!(result, 62);
+
+        let pzzl = test_utils::read_file_as_string("./test_data/day_18_p.txt").unwrap();
+        let result = days::day_18::part_1(pzzl.as_str());
+        println!("{result}");
+        // assert_eq!(result, 1266);
+    }
 }
 
 #[cfg(test)]
