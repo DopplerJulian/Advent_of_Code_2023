@@ -7,19 +7,16 @@ pub fn part_1(plan: &str) -> usize {
     let mut perimeter = 0i32;
 
     for line in plan.lines() {
-        let mut it = line.bytes();
-        let dir = it.next().unwrap();
-        let tens = it.nth(1).unwrap();
-        let ones = it.next().unwrap();
-        let amount = if ones == b' ' {
-            (tens-48) as i32
+        let line_b = line.as_bytes();
+        let amount = if line_b[3] == b' ' {
+            (line_b[2]-48) as i32
         } else {
-            ((tens-48)*10 + ones - 48) as i32
+            ((line_b[2]-48)*10 + line_b[3] - 48) as i32
         };
         perimeter += amount;
         let old_point = last_point;
 
-        match dir {
+        match line_b[0] {
             b'U' => {
                 last_point.1 += amount;
             },
@@ -48,22 +45,22 @@ pub fn part_2(plan: &str) -> usize {
     let mut perimeter = 0i64;
 
     for line in plan.lines() {
+        let line_b = line.as_bytes();
         let amount = i64::from_str_radix(&line[line.len()-7..line.len()-2], 16).unwrap();
-        let dir = &line[line.len()-2..=line.len()-2];
         perimeter += amount;
         let old_point = last_point;
 
-        match dir {
-            "3" => {
+        match line_b[line.len()-2] {
+            b'3' => {
                 last_point.1 += amount;
             },
-            "1" => {
+            b'1' => {
                 last_point.1 -= amount;
             },
-            "2" => {
+            b'2' => {
                 last_point.0 -= amount;
             },
-            "0" => {
+            b'0' => {
                 last_point.0 += amount;
             },
             d => panic!("Direction not found: {d}"),
